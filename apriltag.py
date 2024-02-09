@@ -71,45 +71,24 @@ if __name__ == '__main__':
 
                 print(pose)
 
-                curr_x = res.center.astype(np.int32)[0]
-                curr_y = res.center.astype(np.int32)[1]
-
-                goal_x = 320
-                goal_y = 110
-
-                x_val = 0.3
-                y_val = 0.3
+                # print(pose[0][0]) # y
+                # print(pose[0][2]) # x
+            
+                curr_y = round(pose[0][0],2)
+                curr_x = round(pose[0][2], 2)
                 
-                # if (curr_x < goal_x):
-                #     ep_chassis.drive_speed(x=0, y=y_val, z=0, timeout=1)
-                #     time.sleep(0.5)
-                # if (curr_x > goal_x):
-                #     ep_chassis.drive_speed(x=0, y=-y_val, z=0, timeout=1)
-                #     time.sleep(0.5)
-                # if (curr_x == goal_x):
-                #     time.sleep(0.5)
+                goal_y = 0.01
+                goal_x = 0.31
 
-                # if (curr_y < goal_y):
-                #     ep_chassis.drive_speed(x=-x_val, y=0, z=0, timeout=1)
-                #     time.sleep(0.5)
-                # if (curr_y > goal_y):
-                #     ep_chassis.drive_speed(x=x_val, y=0, z=0, timeout=1)
-                #     time.sleep(0.5)
-                # if (curr_y == goal_y):
-                #     time.sleep(0.5)
+                duration = 1
+    
+                vel_x = (curr_x - goal_x) / duration
+                vel_y = (curr_y - goal_y) / duration
 
-                if (curr_x < goal_x and curr_y < goal_y):
-                    ep_chassis.drive_speed(x=-x_val, y=y_val, z=0, timeout=1)
-                    time.sleep(0.5)
-                elif (curr_x < goal_x and curr_y > goal_y):
-                    ep_chassis.drive_speed(x=x_val, y=y_val, z=0, timeout=1)
-                    time.sleep(0.5)
-                elif (curr_x > goal_x and curr_y < goal_y):
-                    ep_chassis.drive_speed(x=-x_val, y=-y_val, z=0, timeout=1)
-                    time.sleep(0.5)
-                elif (curr_x > goal_x and curr_y > goal_y):
-                    ep_chassis.drive_speed(x=x_val, y=-y_val, z=0, timeout=1)
-                    time.sleep(0.5)
+                print(f"velx {vel_x}")
+                print(f"vely {vel_y}")
+                ep_chassis.drive_speed(x=vel_x, y=vel_y, z=0, timeout=duration)
+                
 
             cv2.imshow("img", img)
             cv2.waitKey(10)
@@ -119,3 +98,5 @@ if __name__ == '__main__':
             ep_robot.close()
             print ('Exiting')
             exit(1)
+
+
