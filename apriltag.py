@@ -71,32 +71,29 @@ if __name__ == '__main__':
 
                 print(pose)
 
-                # print(pose[0][0]) # y
-                # print(pose[0][2]) # x
+                # (pose[0][0]) # y
+                # (pose[0][2]) # x
             
                 curr_y = round(pose[0][0],2)
                 curr_x = round(pose[0][2], 2)
+                rot = round(pose[1][2], 2) * 1000 / 3.14
                 
                 goal_y = 0.01
                 goal_x = 0.31
 
-                duration = 1
+                duration = 0.5
     
                 vel_x = (curr_x - goal_x) / duration
                 vel_y = (curr_y - goal_y) / duration
 
-                print(f"velx {vel_x}")
-                print(f"vely {vel_y}")
-                ep_chassis.drive_speed(x=vel_x, y=vel_y, z=0, timeout=duration)
+                ep_chassis.drive_speed(x=vel_x, y=vel_y, z=rot, timeout=duration)
                 
 
             cv2.imshow("img", img)
-            cv2.waitKey(10)
+            cv2.waitKey(6)
 
         except KeyboardInterrupt:
             ep_camera.stop_video_stream()
             ep_robot.close()
             print ('Exiting')
             exit(1)
-
-
