@@ -25,11 +25,12 @@ def ucs(graph, start, goal):
 
 
 #start new code
-W = 100 # wall weight
+W = 256 # wall weight
 #13x13 matrix 
-numRows = 13
-numCols = 13 
-Map =      [ [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
+numRows = 26
+numCols = 26 
+
+oldMap =   [ [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
              [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
              [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
              [  W,  1,  1,  W,  W,  W,  W,  W,  W,  W,  1,  1,  W],
@@ -42,6 +43,34 @@ Map =      [ [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
              [  W,  1,  1,  1,  1,  1,  W,  1,  1,  1,  1,  1,  W],
              [  W,  1,  1,  1,  1,  1,  W,  1,  1,  1,  1,  1,  W],
              [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
+             ]
+
+Map =       [[  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
+             [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
              ]
 def generateNodeNeighbors(row,col,arrMap):
     neighbors = {} 
@@ -63,8 +92,8 @@ for i in range(numRows):
 #print(graphMap)
 #end new code
 
-start_node = '62'
-goal_node = '611'
+start_node = '124'
+goal_node = '1222'
 path_to_goal = ucs(graphMap, start_node, goal_node)
 if path_to_goal:
     print("Path to goal:", path_to_goal)
