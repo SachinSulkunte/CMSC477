@@ -80,20 +80,20 @@ def generateNodeNeighbors(row,col,arrMap):
             jCol = j + col
             if iRow >= 0 and iRow < numRows and jCol >= 0 and jCol < numCols: # checks if within map bounds 
                 if i != 0 or j != 0: #makes sure not mapping to same nod   
-                    neighborName = str(iRow) + str(jCol)
+                    neighborName = str(iRow) + " " +  str(jCol)
                     neighbors.update({neighborName:arrMap[iRow][jCol]})
     return neighbors
 
 graphMap = {}
 for i in range(numRows):
     for j in range(numCols):
-        nodeName = str(i) + str(j)
+        nodeName = str(i) + " " + str(j)
         graphMap.update({nodeName:generateNodeNeighbors(i,j,Map)})
 #print(graphMap)
 #end new code
 
-start_node = '124'
-goal_node = '1222'
+start_node = "12 4"
+goal_node = "12 22"
 path_to_goal = ucs(graphMap, start_node, goal_node)
 if path_to_goal:
     print("Path to goal:", path_to_goal)
