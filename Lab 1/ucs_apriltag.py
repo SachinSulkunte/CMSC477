@@ -1,32 +1,27 @@
+import numpy as np
 import queue
 
-def add(adj_list, a, b):
-    adj_list.setdefault(a, []).append(b)
-    adj_list.setdefault(b, []).append(a)
+obstacles = ['0 2', '0 3', '0 4', '0 5', '0 6', '0 7', '0 8', '1 2', '1 8', '2 2', '2 8', '3 2', '3 8', '4 2', '4 8', '4 5', '5 5', '6 5', '7 5', '8 5', '9 5', '10 5']
 
-def get_adjMatrix(matrix):
-    adj_list = {}
-    print(f"len(matrix[3]), {len(matrix[3])}")
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            if j < len(matrix[i]) - 1:
-                add(adj_list, matrix[i][j], matrix[i][j+1])
-            if i < len(matrix[i]) - 1:
-                for x in range(max(0, j - 1), min(len(matrix[i+1]), j+2)):
-                    add(adj_list, matrix[i][j], matrix[i+1][x])
-    return adj_list
-
-def get_costDict(matrix, obs):
-    cost_dict = {}
-    for key, val in matrix.items():
-        cell_dict = {}
-        for v in val:
-            if v in obs:
-                cell_dict[v] = 100
-            else:
-                cell_dict[v] = 1
-        cost_dict[key] = cell_dict
-    return cost_dict
+def generateNodeNeighbors(row,col,arrMap):
+    neighbors = {} 
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            iRow = i + row
+            jCol = j + col
+            #print(i, j, row, col, iRow, jCol)
+            if iRow >= 0 and iRow < matrix.shape[0] and jCol >= 0 and jCol < matrix.shape[1]: # checks if within map bounds 
+                if i != 0 or j != 0: #makes sure not mapping to same nod   
+                    neighborName = str(iRow) + " " +  str(jCol)
+                    if neighborName in obstacles:
+                        neighbors.update({neighborName:1000.0})
+                    else:
+                        if (i == 1 and j == 0) or (i == -1 and j == 0) or (j == 1 and i == 0) or (j == -1 and i == 0):
+                            #print(row, col, iRow, jCol)
+                            neighbors.update({neighborName:26.6})
+                        else:
+                            neighbors.update({neighborName:37.618})
+    return neighbors
 
 def ucs(graph, start, goal):
     visited = set()
@@ -50,27 +45,15 @@ def ucs(graph, start, goal):
 
     return None  # Goal not found
 
-matrix = [
-    ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '010'],
-    ['10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '110'],
-    ['20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '210'],
-    ['30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '310'],
-    ['40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '410'],
-    ['50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '510'],
-    ['60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '610'],
-    ['70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '710'],
-    ['80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '810'],
-    ['90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '1010'],
-    ['100', '101', '102', '103', '104', '105', '106', '107', '108', '109', '1010']
-]
+graphMap = {}
+matrix = np.ones((11, 11))
+for iy, ix in np.ndindex(matrix.shape):
+    nodeName = str(iy) + " " + str(ix)
+    graphMap.update({nodeName:generateNodeNeighbors(iy,ix,matrix)})
 
-obstacles = ['02', '03', '04', '05', '06', '07', '08', '12', '18', '22', '28', '32', '38', '42', '48', '45', '55', '65', '75', '85', '95', '105']
-
-graph = get_costDict(get_adjMatrix(matrix), obstacles)
-
-start_node = '30'
-goal_node = '310'
-path_to_goal = ucs(graph, start_node, goal_node)
+start_node = '3 0'
+goal_node = '3 10'
+path_to_goal = ucs(graphMap, start_node, goal_node)
 if path_to_goal:
     print("Path to goal:", path_to_goal)
 else:
