@@ -84,18 +84,21 @@ def generateNodeNeighbors(row,col,arrMap):
                     neighbors.update({neighborName:arrMap[iRow][jCol]})
     return neighbors
 
-graphMap = {}
-for i in range(numRows):
-    for j in range(numCols):
-        nodeName = str(i) + " " + str(j)
-        graphMap.update({nodeName:generateNodeNeighbors(i,j,Map)})
-#print(graphMap)
-#end new code
+# takes in boolean 
+def compute_path():
+    graphMap = {}
+    for i in range(numRows):
+        for j in range(numCols):
+            nodeName = str(i) + " " + str(j)
+            graphMap.update({nodeName:generateNodeNeighbors(i,j,Map)})
 
-start_node = "12 4"
-goal_node = "12 22"
-path_to_goal = ucs(graphMap, start_node, goal_node)
-if path_to_goal:
-    print("Path to goal:", path_to_goal)
-else:
-    print("Goal not found.")
+    start_node = "12 4"
+    goal_node = "12 22"
+    path_to_goal = ucs(graphMap, start_node, goal_node)
+    if path_to_goal:
+        return path_to_goal
+    else:
+        return None
+
+
+print(compute_path())
