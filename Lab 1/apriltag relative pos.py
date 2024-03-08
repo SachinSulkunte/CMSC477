@@ -50,8 +50,12 @@ def getRelativePos():
                 curr_x = round(pose[0][2], 2)
                 rot = round(pose[1][2], 2) * 180 / 3.14
                 
-                position = [curr_x, curr_y, rot]
-                return position
+                posi_initial = [[curr_x], [curr_y]]
+                rotation = [[np.cos(rot),np.sin(rot)],[np.sin(-1*rot),np.cos(rot)]]
+                posi_final = rotation*posi_initial
+                
+                return posi_final
+            
             cv2.imshow("img", img)
             cv2.waitKey(1)
 
