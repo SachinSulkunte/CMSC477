@@ -157,31 +157,31 @@ if __name__ == '__main__':
                     y_dist = XYdistanceDict['3 0 4 1'][1] + XYdistanceDict['4 1 5 2'][1]
                     x_avg = (curr_x + x_dist) / 2.0
                     y_avg = (curr_y + y_dist) / 2.0
-                    ep_chassis.move(x=x_avg, y=y_avg, z=0, xy_speed=0.7).wait_for_completed()
+                    ep_chassis.move(x=x_dist, y=y_dist, z=0, xy_speed=0.7).wait_for_completed()
                 elif res.tag_id == 38:
                     x_dist = XYdistanceDict['5 2 4 3'][0] + XYdistanceDict['4 3 3 4'][0]
                     y_dist = XYdistanceDict['5 2 4 3'][1] + XYdistanceDict['4 3 3 4'][1]
                     x_avg = (curr_x + x_dist) / 2.0
                     y_avg = (curr_y + y_dist) / 2.0
-                    ep_chassis.move(x=x_avg, y=y_avg, z=0, xy_speed=0.7).wait_for_completed()
+                    ep_chassis.move(x=x_dist, y=y_dist, z=0, xy_speed=0.7).wait_for_completed()
                 elif res.tag_id == 44:
                     x_dist = XYdistanceDict['3 4 3 5'][0] + XYdistanceDict['3 5 3 6'][0]
                     y_dist = XYdistanceDict['3 4 3 5'][1] + XYdistanceDict['3 5 3 6'][1]
                     x_avg = (curr_x + x_dist) / 2.0
                     y_avg = (curr_y + y_dist) / 2.0
-                    ep_chassis.move(x=x_avg, y=y_avg, z=0, xy_speed=0.7).wait_for_completed()
+                    ep_chassis.move(x=x_dist, y=y_dist, z=0, xy_speed=0.7).wait_for_completed()
                 elif res.tag_id == 44:
                     x_dist = XYdistanceDict['3 6 4 7'][0] + XYdistanceDict['4 7 5 8'][0]
                     y_dist = XYdistanceDict['3 6 4 7'][1] + XYdistanceDict['4 7 5 8'][1]
                     x_avg = (curr_x + x_dist) / 2.0
                     y_avg = (curr_y + y_dist) / 2.0
-                    ep_chassis.move(x=x_avg, y=y_avg, z=180, xy_speed=0.7).wait_for_completed()
+                    ep_chassis.move(x=x_dist, y=y_dist, z=180, xy_speed=0.7).wait_for_completed()
                 elif res.tag_id == 39:
-                    x_dist = XYdistanceDict['5 8 4 9'][0] + XYdistanceDict['4 9 3 10'][0]
-                    y_dist = XYdistanceDict['5 8 4 9'][1] + XYdistanceDict['4 9 3 10'][1]
+                    x_dist = -1.0 * (XYdistanceDict['5 8 4 9'][0] + XYdistanceDict['4 9 3 10'][0])
+                    y_dist = -1.0 * (XYdistanceDict['5 8 4 9'][1] + XYdistanceDict['4 9 3 10'][1])
                     x_avg = (curr_x + x_dist) / 2.0
                     y_avg = (curr_y + y_dist) / 2.0
-                    ep_chassis.move(x=x_avg, y=y_avg, z=0, xy_speed=0.7).wait_for_completed()
+                    ep_chassis.move(x=x_dist, y=y_dist, z=0, xy_speed=0.7).wait_for_completed()
 
             cv2.imshow("img", img)
             cv2.waitKey(10)
