@@ -88,7 +88,6 @@ if __name__ == '__main__':
             results = at_detector.detect(gray, estimate_tag_pose=False)
             for res in results:
                 if res.tag_id == 38 and stage == 1:
-                    print("see 38")
                     pose = find_pose_from_tag(K, res)
                     rot, jaco = cv2.Rodrigues(pose[1], pose[1])
 
@@ -120,7 +119,7 @@ if __name__ == '__main__':
 
                     pts = res.corners.reshape((-1, 1, 2)).astype(np.int32)
                     img = cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=5)
-                    # cv2.circle(img, tuple(res.center.astype(np.int32)), 5, (0, 0, 255), -1)
+                    cv2.circle(img, tuple(res.center.astype(np.int32)), 5, (0, 0, 255), -1)
 
                     curr_y = round(pose[0][0],2)
                     curr_x = round(pose[0][2], 2)
@@ -137,12 +136,12 @@ if __name__ == '__main__':
 
                     if abs(curr_y - goal_y) < 0.05 and abs(curr_x -  goal_x) < 0.05:
                         stage = 3
-                        # print("start spin")
-                        # ep_chassis.move(x=0, y=0, z=-180, z_speed=1).wait_for_completed()
-                        # print("spinning")
-                        ep_chassis.drive_speed(x=x_val, y=-y_val, z=30, timeout=5)
-                        time.sleep(6)
-                        ep_chassis.drive_speed(x=0, y=-y_val, z=0, timeout=5)
+                        ep_chassis.drive_speed(x=0, y=0, z=0, timeout=1) # reset speed
+                        time.sleep(0.2)
+                        print("start spin")
+                        ep_chassis.move(x=0, y=0, z=-180, z_speed=1).wait_for_completed()
+                        print("spinning")
+                        ep_chassis.drive_speed(x=0, y=-y_val, z=0, timeout=5) #call to get direction
 
                 elif res.tag_id == 39 and stage == 3:
                     pose = find_pose_from_tag(K, res)
@@ -157,8 +156,8 @@ if __name__ == '__main__':
                     rot = round(pose[1][2], 2) * 1000 / 3.14
                     
                     goal_y = 0.05
-                    goal_x = 0.2
-                    duration = 0.5
+                    goal_x = 0.266 * 4 # clear corner
+                    duration = 1
         
                     vel_x = (curr_x - goal_x) / duration
                     vel_y = (curr_y - goal_y) / duration
@@ -168,6 +167,32 @@ if __name__ == '__main__':
                     if abs(curr_y - goal_y) < 0.05 and abs(curr_x -  goal_x) < 0.05:
                         stage = 4
                         ep_chassis.drive_speed(x=0.3, y=0, z=0, timeout=5)
+
+                elif res.tag_id == 45 and stage == 4:
+                    pose = find_pose_from_tag(K, res)
+                    rot, jaco = cv2.Rodrigues(pose[1], pose[1])
+
+                    pts = res.corners.reshape((-1, 1, 2)).astype(np.int32)
+                    img = cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=5)
+                    cv2.circle(img, tuple(res.center.astype(np.int32)), 5, (0, 0, 255), -1)
+
+                    curr_y = round(pose[0][0],2)
+                    curr_x = round(pose[0][2], 2)
+                    rot = round(pose[1][2], 2) * 1000 / 3.14
+                    
+                    goal_y = 0.00
+                    goal_x = 0.266  # align on goal square
+                    duration = 1
+        
+                    vel_x = (curr_x - goal_x) / duration
+                    vel_y = (curr_y - goal_y) / duration
+
+                    ep_chassis.drive_speed(x=vel_x, y=vel_y, z=0, timeout=duration)
+
+                    if abs(curr_y - goal_y) < 0.05 and abs(curr_x -  goal_x) < 0.05:
+                        ep_chassis.drive_speed(x=0, y=0, z=0, timeout=5) # stop movement
+                        break
+                    
             cv2.imshow("img", img)
             cv2.waitKey(6)
 
