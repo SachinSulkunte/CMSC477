@@ -9,8 +9,6 @@ def ucs(graph, start, goal):
         cost, node, path = frontier.get()
         if node not in visited:
             visited.add(node)
-            # Do something with the node if needed
-            #print(node)
 
             if node == goal:
                 return path  # Return the path to the goal
@@ -27,13 +25,10 @@ def ucs(graph, start, goal):
 #start new code
 W = 256 # wall weight
 #13x13 matrix 
-numRows = 26
-numCols = 26 
+numRows = 10
+numCols = 13 
 
-oldMap =   [ [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  W,  W,  W,  W,  W,  W,  W,  1,  1,  W],
+Map =   [    [  W,  1,  1,  W,  W,  W,  W,  W,  W,  W,  1,  1,  W],
              [  W,  1,  1,  W,  1,  1,  1,  1,  1,  W,  1,  1,  W],
              [  W,  1,  1,  W,  1,  1,  1,  1,  1,  W,  1,  1,  W],
              [  W,  1,  1,  W,  1,  1,  1,  1,  1,  W,  1,  1,  W],
@@ -45,43 +40,15 @@ oldMap =   [ [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
              [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
              ]
 
-Map =       [[  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  W,  W,  W,  W,  W,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W,  W,  W,  W,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  W],
-             [  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W,  W],
-             ]
-def generateNodeNeighbors(row,col,arrMap):
-    neighbors = {} 
-    for i in range(-1, 2):
-        for j in range(-1, 2):
-            iRow = i + row
-            jCol = j + col
-            if iRow >= 0 and iRow < numRows and jCol >= 0 and jCol < numCols: # checks if within map bounds 
-                if i != 0 or j != 0: #makes sure not mapping to same nod   
-                    neighborName = str(iRow) + " " +  str(jCol)
-                    neighbors.update({neighborName:arrMap[iRow][jCol]})
+def generateNodeNeighbors(row, col, arrMap):
+    neighbors = {}
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Cardinal directions: right, left, down, up
+    for dir_row, dir_col in directions:
+        iRow = row + dir_row
+        jCol = col + dir_col
+        if 0 <= iRow < numRows and 0 <= jCol < numCols:  # Check if within map bounds
+            neighborName = str(iRow) + " " + str(jCol)
+            neighbors[neighborName] = arrMap[iRow][jCol]
     return neighbors
 
 # takes in boolean 
@@ -92,8 +59,8 @@ def compute_path():
             nodeName = str(i) + " " + str(j)
             graphMap.update({nodeName:generateNodeNeighbors(i,j,Map)})
 
-    start_node = "12 4"
-    goal_node = "12 22"
+    start_node = "3 1"
+    goal_node = "3 11"
     path_to_goal = ucs(graphMap, start_node, goal_node)
     if path_to_goal:
         return path_to_goal
