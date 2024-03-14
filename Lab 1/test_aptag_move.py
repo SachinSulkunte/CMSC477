@@ -4,7 +4,7 @@ import numpy as np
 import time
 from robomaster import robot
 from robomaster import camera
-import aprilTagPathing
+# import aprilTagPathing
 
 at_detector = Detector(
     families="tag36h11",
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     ep_camera.start_video_stream(display=True, resolution=camera.STREAM_360P)
     ep_chassis = ep_robot.chassis
 
-    path = aprilTagPathing.compute_path()
+    # path = aprilTagPathing.compute_path()
 
     tag_size=0.16 # tag size in meters
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
                     rot = round(pose[1][2], 2) * 1000 / 3.14
                     
                     goal_y = -0.05
-                    goal_x = 0.2
+                    goal_x = 0.17
                     duration = 0.75
         
                     vel_x = (curr_x - goal_x) / duration
@@ -126,7 +126,7 @@ if __name__ == '__main__':
                     rot = round(pose[1][2], 2) * 1000 / 3.14
                     
                     goal_y = 0.05
-                    goal_x = 0.2
+                    goal_x = 0.17
                     duration = 0.75
         
                     vel_x = (curr_x - goal_x) / duration
@@ -137,12 +137,15 @@ if __name__ == '__main__':
                     if abs(curr_y - goal_y) < 0.05 and abs(curr_x -  goal_x) < 0.05:
                         stage = 3
                         ep_chassis.drive_speed(x=0, y=0, z=0, timeout=1) # reset speed
-                        time.sleep(0.2)
+                        time.sleep(1)
                         print("start spin")
-                        ep_chassis.move(x=0, y=0, z=-180, z_speed=1).wait_for_completed()
+                        ep_chassis.move(x=0, y=0, z=-180, z_speed=45).wait_for_completed()
                         print("spinning")
-                        ep_chassis.drive_speed(x=0, y=-y_val, z=0, timeout=5) #call to get direction
+                        time.sleep(1)
+                        ep_chassis.move(x=-0.1, y=0, z=0).wait_for_completed()
 
+                        ep_chassis.drive_speed(x=0, y=-y_val, z=0, timeout=5) #call to get direction
+                        time.sleep(1)
                 elif res.tag_id == 39 and stage == 3:
                     pose = find_pose_from_tag(K, res)
                     rot, jaco = cv2.Rodrigues(pose[1], pose[1])
@@ -155,8 +158,8 @@ if __name__ == '__main__':
                     curr_x = round(pose[0][2], 2)
                     rot = round(pose[1][2], 2) * 1000 / 3.14
                     
-                    goal_y = 0.05
-                    goal_x = 0.266 * 4 # clear corner
+                    goal_y = 0.1
+                    goal_x = 0.8 # clear corner
                     duration = 1
         
                     vel_x = (curr_x - goal_x) / duration
@@ -166,7 +169,7 @@ if __name__ == '__main__':
 
                     if abs(curr_y - goal_y) < 0.05 and abs(curr_x -  goal_x) < 0.05:
                         stage = 4
-                        ep_chassis.drive_speed(x=0.3, y=0, z=0, timeout=5)
+                        ep_chassis.drive_speed(x=0, y=0.3, z=0, timeout=5)
 
                 elif res.tag_id == 45 and stage == 4:
                     pose = find_pose_from_tag(K, res)
@@ -181,7 +184,7 @@ if __name__ == '__main__':
                     rot = round(pose[1][2], 2) * 1000 / 3.14
                     
                     goal_y = 0.00
-                    goal_x = 0.266  # align on goal square
+                    goal_x = 0.26  # align on goal square
                     duration = 1
         
                     vel_x = (curr_x - goal_x) / duration
