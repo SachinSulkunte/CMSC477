@@ -1,4 +1,5 @@
 import queue
+import matplotlib.pyplot as plt
 
 def ucs(graph, start, goal):
     visited = set()
@@ -67,5 +68,31 @@ def compute_path():
     else:
         return None
 
+def visualize_path(coordinates):
+    x_coords = []
+    y_coords = []
+    for coord in coordinates:
+        x, y = coord.split()
+        x_coords.append(int(x))
+        y_coords.append(int(y))
+    
+    # Set up the grid
+    plt.figure()
+    plt.grid(True)
+        
+    # Plot the path
+    plt.plot(x_coords, y_coords, marker='o')
+    
+    # Set plot limits
+    plt.xlim(min(x_coords) - 1, max(x_coords) + 1)
+    plt.ylim(min(y_coords) - 1, max(y_coords) + 1)
+    
+    # Switch axis labels
+    plt.xlabel('Y')
+    plt.ylabel('X')
+    plt.title('Path')
+    # Show plot
+    plt.show()
 
-print(compute_path())
+path = compute_path()
+visualize_path(path)
