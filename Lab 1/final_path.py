@@ -4,7 +4,7 @@ import numpy as np
 import time
 from robomaster import robot
 from robomaster import camera
-# import aprilTagPathing
+import aprilTagPathing
 
 at_detector = Detector(
     families="tag36h11",
@@ -39,7 +39,8 @@ def find_pose_from_tag(K, detection):
 
     return p.reshape((3,)), r.reshape((3,))
 
-def change_direction(stage, path, current_ind):
+# returns array containing x_vel, y_vel for next movement
+def change_direction(path, current_ind):
 
     x = path[current_ind].split(' ')[0]
     y = path[current_ind].split(' ')[1]
@@ -47,14 +48,22 @@ def change_direction(stage, path, current_ind):
     next_x = path[current_ind + 1].split(' ')[0]
     next_y = path[current_ind + 1].split(' ')[1]
 
+    # default values
+    x_vel = 0
+    y_vel = 0
+
+    # change values if needed based on next coordinate
     if x < next_x:
         y_vel = 0.3
-        x_vel = 0
-    else:
+    elif x > next_x:
         y_vel = -0.3
-        x_vel = 0
-    
-    return stage
+    elif y < next_y:
+        x_vel = 0.3
+    elif y > next_y:
+        x_vel = -0.3
+
+    speeds = [x_vel, y_vel]
+    return speeds
 
 if __name__ == '__main__':
     ep_robot = robot.Robot()
@@ -66,7 +75,7 @@ if __name__ == '__main__':
     ep_camera.start_video_stream(display=True, resolution=camera.STREAM_360P)
     ep_chassis = ep_robot.chassis
 
-    # path = aprilTagPathing.compute_path()
+    path = aprilTagPathing.compute_path()
 
     tag_size=0.16 # tag size in meters
 
@@ -109,7 +118,6 @@ if __name__ == '__main__':
                     ep_chassis.drive_speed(x=vel_x, y=vel_y, z=0, timeout=duration)
 
                     if abs(curr_y - goal_y) < 0.05 and abs(curr_x -  goal_x) < 0.05:
-                        print("moving next stage")
                         stage = 2
                         ep_chassis.drive_speed(x=x_val, y=-y_val, z=z_val, timeout=5)
                 
@@ -138,9 +146,7 @@ if __name__ == '__main__':
                         stage = 3
                         ep_chassis.drive_speed(x=0, y=0, z=0, timeout=1) # reset speed
                         time.sleep(1)
-                        print("start spin")
                         ep_chassis.move(x=0, y=0, z=-180, z_speed=45).wait_for_completed()
-                        print("spinning")
                         time.sleep(1)
                         ep_chassis.move(x=-0.1, y=0, z=0).wait_for_completed()
 
