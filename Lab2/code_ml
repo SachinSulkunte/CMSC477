@@ -1,0 +1,25 @@
+from ultralytics import YOLO
+import cv2
+import time
+from robomaster import robot
+from robomaster import camera
+from inference_sdk import InferenceHTTPClient
+from roboflow import Roboflow
+
+CLIENT = InferenceHTTPClient(
+    api_url="https://detect.roboflow.com",
+    api_key="94RstS73FVj6Dj7723Ix"
+)
+
+# result = CLIENT.infer(your_image.jpg, model_id="lab2-zywuo/4")
+
+rf = Roboflow(api_key="94RstS73FVj6Dj7723Ix")
+project = rf.workspace().project("lab2-zywuo")
+model = project.version(4).model
+# infer on a local image
+print(model.predict("/Users/servi/lab1_cmsc477/your_image.jpg", confidence=40, overlap=30).json())
+# visualize your prediction
+model.predict("/Users/servi/lab1_cmsc477/your_image.jpg", confidence=40, overlap=30).save("prediction.jpg")
+# infer on an image hosted elsewhere
+# print(model.predict("URL_OF_YOUR_IMAGE", hosted=True, confidence=40, overlap=30).json())
+
