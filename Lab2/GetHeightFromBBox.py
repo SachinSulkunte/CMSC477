@@ -40,16 +40,19 @@ def distance_from_box_size(boxWidth, boxHeight):
     b = -214.7402
     c = 186.6250
     expected_aspect_ratio = 7 #h/w
+    vertexHeight = 1.22613 #closest distance quad fit is modelled for
 
     actual_aspect_ratio = boxHeight / boxWidth
     correction = expected_aspect_ratio/actual_aspect_ratio
     actualHeight = boxHeight * correction
-    
-    h_distance = a * actualHeight^2 + b * actualHeight + c 
+    if actualHeight >  vertexHeight:
+        h_distance = 45
+    else:
+        h_distance = a * actualHeight^2 + b * actualHeight + c 
     distanceSignal.append(h_distance)
 
     #rolling median filter
-    if(len(distanceSignal) >= 3):
+    if(len(distanceSignal) > 3):
         h_distance =  np.median(distanceSignal[-3:])
 
     return h_distance
