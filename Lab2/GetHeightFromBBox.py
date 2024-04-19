@@ -8,7 +8,7 @@ import numpy as np
 distanceSignal = []
 
 def getDistanceFromBB():
-    model = YOLO('C:\\Users\\Melin\\OneDrive\\Spring 24\\CMSC477\\Lab 0\\Lab2\\lego.pt')
+    model = YOLO('C:\\Users\\Melin\\OneDrive\\Spring 24\\CMSC477\\Lab 0\\Lab2\\better.pt')
     # Use vid instead of ep_camera to use your laptop's webcam
     # vid = cv2.VideoCapture(0)
     ep_robot = robot.Robot()
@@ -36,19 +36,17 @@ distanceSignal = []
 def distance_from_box_size(boxWidth, boxHeight):
 
     #param
-    a = 80.8847
-    b = -214.7402
-    c = 186.6250
-    expected_aspect_ratio = 7 #h/w
-    vertexHeight = 1.22613 #closest distance quad fit is modelled for
+    a = -6.79187460413004e-07
+    b = 2.963889750447219e-04
+    c = -0.0469580266109994
+    d = 3.02446421107312
+    vertexHeight = 185 #closest distance quad fit is modelled for
 
-    actual_aspect_ratio = boxHeight / boxWidth
-    correction = expected_aspect_ratio/actual_aspect_ratio
-    actualHeight = boxHeight * correction
-    if actualHeight >  vertexHeight:
-        h_distance = 45
+    print("actualHeight: " + str(boxHeight))
+    if boxHeight > vertexHeight:
+        h_distance = 0.1
     else:
-        h_distance = a * actualHeight^2 + b * actualHeight + c 
+        h_distance = a * np.power(boxHeight,3) + b * np.power(boxHeight,2) + c * boxHeight + d
     distanceSignal.append(h_distance)
 
     #rolling median filter
