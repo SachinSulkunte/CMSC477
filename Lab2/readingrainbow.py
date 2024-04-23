@@ -31,8 +31,8 @@ def thres_image(img):
     blueLower = np.array([96,147,59])
     blueUpper = np.array([179,255,255])
     blue_mask = cv2.inRange(hsv, blueLower, blueUpper)
-    cv2.imshow("hsv",hsv)
-    cv2.imshow("hsv blue mask", blue_mask)
+    #cv2.imshow("hsv",hsv)
+    #cv2.imshow("hsv blue mask", blue_mask)
     thresholded = cv2.bitwise_and(img,img, mask=blue_mask)
 
     return thresholded
@@ -78,19 +78,19 @@ def main():
 
     image = cv2.imread("robot_blorange.jpg")
 
-    cv2.imshow("Caption",image)
+    #cv2.imshow("Caption",image)
 
     snip = snip_image(image)
-    cv2.imshow("Snip",snip)
+    #cv2.imshow("Snip",snip)
 
     thresholded= thres_image(snip)
-    cv2.imshow("Thresholded Snip",thresholded)
+    #cv2.imshow("Thresholded Snip",thresholded)
 
     blurred = blur_img(thresholded)
-    cv2.imshow("Blurred Image", blurred)
+    #cv2.imshow("Blurred Image", blurred)
 
     edged = edge_img(blurred)
-    cv2.imshow("Edged", edged)
+    #cv2.imshow("Edged", edged)
 
     lines = line_image(edged)
     print(lines)
