@@ -70,22 +70,24 @@ def plot_Hough_Lines(img, rho, theta):
     return img
 
 def getAngle():
-        
-    image = cv2.imread("robot_blorange.jpg")
 
-    #cv2.imshow("Caption",image)
+    image = grab_frame("Insert the name of the camera feed from here?")
+    
+    # image = cv2.imread("robot_blorange.jpg")
+
+    # cv2.imshow("Caption",image)
 
     snip = snip_image(image)
-    #cv2.imshow("Snip",snip)
+    # cv2.imshow("Snip",snip)
 
     thresholded= thres_image(snip)
-    #cv2.imshow("Thresholded Snip",thresholded)
+    # cv2.imshow("Thresholded Snip",thresholded)
 
     blurred = blur_img(thresholded)
-    #cv2.imshow("Blurred Image", blurred)
+    # cv2.imshow("Blurred Image", blurred)
 
     edged = edge_img(blurred)
-    #cv2.imshow("Edged", edged)
+    # cv2.imshow("Edged", edged)
 
     lines = line_image(edged)
     print(lines)
