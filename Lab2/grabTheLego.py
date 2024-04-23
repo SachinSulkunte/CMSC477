@@ -44,17 +44,18 @@ def find_pose_from_object(K, x, y, w, h, box):
     return p.reshape((3,)), r.reshape((3,))
 
 def distance_from_box_size(boxWidth, boxHeight):
+
     #param
-    a = 80.8847
-    b = -214.7402
-    c = 186.6250
+    gain = 1
+    offset = 1
     expected_aspect_ratio = 7 #h/w
 
     actual_aspect_ratio = boxHeight / boxWidth
     correction = expected_aspect_ratio/actual_aspect_ratio
     actualHeight = boxHeight * correction
     
-    h_distance = a * actualHeight^2 + b * actualHeight + c 
+    h_distance = gain * actualHeight + offset
+
     distanceSignal.append(h_distance)
 
     #rolling median filter
@@ -65,13 +66,14 @@ def distance_from_box_size(boxWidth, boxHeight):
 
 
 if __name__ == '__main__':
-    model = YOLO('C:\\Users\\Melin\\OneDrive\\Spring 24\\CMSC477\\Lab 0\\Lab2\\lego.pt')
+    print("start")
+    model = YOLO('/Users/sachin/Documents/Coursework/CMSC477/CMSC477/Lab2/best_v2.pt')
     # Use vid instead of ep_camera to use your laptop's webcam
     # vid = cv2.VideoCapture(0)
     ep_robot = robot.Robot()
     ep_robot.initialize(conn_type="ap")
     ep_camera = ep_robot.camera
-    ep_camera.start_video_stream(display=False, resolution=camera.STREAM_360P)
+    ep_camera.start_video_stream(display=True, resolution=camera.STREAM_360P)
     ep_chassis = ep_robot.chassis
     ep_gripper = ep_robot.gripper
     ep_arm = ep_robot.robotic_arm
@@ -94,6 +96,7 @@ if __name__ == '__main__':
             # Iterate through the results
             for box, cls, conf in zip(boxes, classes, confidences):
                 x, y, w, h = box
+                K=np.array([[184.752, 0, 320], [0, 184.752, 180], [0, 0, 1]])
                 confidence = conf
                 detected_class = cls
                 name = names[int(cls)]
