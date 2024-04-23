@@ -69,13 +69,8 @@ def plot_Hough_Lines(img, rho, theta):
     cv2.line(img, (x11+272,y11), (x21+272,y21), (0, 255, 0), 5)
     return img
 
-
-def main():
-
-    # camera = cv2.VideoCapture('lanedetectiontestvideo.mp4')
-
-    # image = grab_frame(camera)
-
+def getAngle():
+        
     image = cv2.imread("robot_blorange.jpg")
 
     #cv2.imshow("Caption",image)
@@ -95,30 +90,85 @@ def main():
     lines = line_image(edged)
     print(lines)
 
+    if lines != None:
+    
+        rho = []
+        theta = []
+        for i in range(0, len(lines)):
+            for r, o in lines[i]:
+                rho.append(r)
+                theta.append(o)
+        print(rho)
+        print(theta)
+        print("---")
+        rho_avg = np.mean(rho)
+        theta_avg = np.mean(theta)
+        angle = (180/np.pi)*theta_avg
 
-    rho = []
-    theta = []
-    for i in range(0, len(lines)):
-        for r, o in lines[i]:
-            rho.append(r)
-            theta.append(o)
-    print(rho)
-    print(theta)
-    print("---")
-    rho_avg = np.mean(rho)
-    theta_avg = np.mean(theta)
-    angle = (180/np.pi)*theta_avg
+        final = plot_Hough_Lines(snip,rho_avg,theta_avg)
+        cv2.imshow("Final",final)
 
-    final = plot_Hough_Lines(snip,rho_avg,theta_avg)
-    cv2.imshow("Final",final)
-
-    print(angle)
+        print(angle)
 
 
 
 
-    print("---")
-    cv2.waitKey(0)
+        print("---")
+        cv2.waitKey(0)
 
-if __name__ == '__main__':
-    main()
+        return angle
+
+
+
+# def main():
+
+#     # camera = cv2.VideoCapture('lanedetectiontestvideo.mp4')
+
+#     # image = grab_frame(camera)
+
+#     image = cv2.imread("robot_blorange.jpg")
+
+#     #cv2.imshow("Caption",image)
+
+#     snip = snip_image(image)
+#     #cv2.imshow("Snip",snip)
+
+#     thresholded= thres_image(snip)
+#     #cv2.imshow("Thresholded Snip",thresholded)
+
+#     blurred = blur_img(thresholded)
+#     #cv2.imshow("Blurred Image", blurred)
+
+#     edged = edge_img(blurred)
+#     #cv2.imshow("Edged", edged)
+
+#     lines = line_image(edged)
+#     print(lines)
+
+
+#     rho = []
+#     theta = []
+#     for i in range(0, len(lines)):
+#         for r, o in lines[i]:
+#             rho.append(r)
+#             theta.append(o)
+#     print(rho)
+#     print(theta)
+#     print("---")
+#     rho_avg = np.mean(rho)
+#     theta_avg = np.mean(theta)
+#     angle = (180/np.pi)*theta_avg
+
+#     final = plot_Hough_Lines(snip,rho_avg,theta_avg)
+#     cv2.imshow("Final",final)
+
+#     print(angle)
+
+
+
+
+#     print("---")
+#     cv2.waitKey(0)
+
+# if __name__ == '__main__':
+#     main()
