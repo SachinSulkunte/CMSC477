@@ -10,6 +10,16 @@ import math
 from numpy.linalg import inv
 from ultralytics import YOLO 
 import math
+import zmq
+
+context = zmq.Context()
+
+# create socket
+# server laptop ip addr
+SERVER_ADDR = ""
+print("Connecting to communication server…")
+socket = context.socket(zmq.REQ)
+socket.connect(SERVER_ADDR)
 
 distanceSignal = []
 
@@ -92,19 +102,22 @@ def getAngle(image):
     # cv2.imshow("Edged", edged)
 
     lines = line_image(edged)
-    print(lines)
+    # print(lines)
 
     
     rho = []
     theta = []
     if lines is not None:
+    
+        rho = []
+        theta = []
         for i in range(0, len(lines)):
             for r, o in lines[i]:
                 rho.append(r)
                 theta.append(o)
-        print(rho)
-        print(theta)
-        print("---")
+        # print(rho)
+        # print(theta)
+        # print("---")
         rho_avg = np.mean(rho)
         theta_avg = np.mean(theta)
         angle = (180/np.pi)*theta_avg
@@ -112,11 +125,12 @@ def getAngle(image):
         final = plot_Hough_Lines(image,rho_avg,theta_avg)
         cv2.imshow("Final",final)
 
-    bottom_percentile = image.shape[0] * 0.9
-    bottom_of_line = max(final[:, 0, 1])
-    is_close = bottom_of_line >= bottom_percentile
+        bottom_percentile = image.shape[0] * 0.9
+        bottom_of_line = max(final[:, 0, 1])
+        is_close = bottom_of_line >= bottom_percentile
 
-    return angle, is_close
+        return angle, is_close
+    return None, None
 
 def find_pose_from_object(K, x, y, w, h, box):
     w_half_size = w / 2
@@ -237,7 +251,7 @@ if __name__ == '__main__':
     stage1 = False
     first = True
     first_angle = True
-    ctr = 5
+    ctr = 4
 
     while True:
         try:
@@ -269,12 +283,12 @@ if __name__ == '__main__':
                         print("Distance: " + str(distance_from_box_size(w, h)))
                         print("Detected object: ", name)
                         
-                        # pose = find_pose_from_object(K, x, y, w, h, box)
-                        # rot, jaco = cv2.Rodrigues(pose[1], pose[1])
+                        pose = find_pose_from_object(K, x, y, w, h, box)
+                        rot, jaco = cv2.Rodrigues(pose[1], pose[1])
 
-                        # pts = box.corners.reshape((-1, 1, 2)).astype(np.int32)
-                        # img = cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=5)
-                        # cv2.circle(img, tuple(box.center.astype(np.int32)), 5, (0, 0, 255), -1)
+                        pts = box.corners.reshape((-1, 1, 2)).astype(np.int32)
+                        img = cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=5)
+                        cv2.circle(img, tuple(box.center.astype(np.int32)), 5, (0, 0, 255), -1)
                     
                         # rot = round(pose[1][2], 2) 
                         if stage1 is False:
@@ -293,6 +307,7 @@ if __name__ == '__main__':
                             # ep_chassis.drive_speed(x=vel_x, y=vel_y, z=0, timeout=duration)
                             
                             # open gripper, drive to lego
+                            ep_arm.move(x=goal_x - 1.0, y=goal_y - 1.0).wait_for_completed()
                             ep_gripper.open(power=50)
                             print("opening")
                             time.sleep(1)
@@ -314,24 +329,32 @@ if __name__ == '__main__':
                 # drive to blue line
                 print("driving to blue line")
                 angle, is_close = getAngle(frame)
-                angle = float(angle)
+                if angle is not None:
+                    angle = float(angle)
                 print(angle)
                 ctr-=1
                 if first_angle and ctr == 0:
                     ep_chassis.move(x=0, y=0, z=90-angle, z_speed=10).wait_for_completed() # rotate to blue line
                     first_angle = False
 
-                if not is_close: # drive forward if not close yet
+                if is_close is not True and angle is not None: # drive forward if not close yet
                     ep_chassis.drive_speed(x=0.1, y=0, z=0, timeout=1)
                     time.sleep(0.4)
                 else:
                     if first == True:
+                        print("cant see line")
                         ep_chassis.move(x=0.2, y=0, z=0).wait_for_completed()
                         first = False
-                    print("close")
                     ep_chassis.drive_speed(x=0, y=0, z=0, timeout=1)
+                    
                     # release lego once other robot has arrived
-                    time.sleep(5)
+                    socket.send(b"Reached line")
+
+                    #  wait on reply
+                    message = socket.recv()
+                    print("Received reply [ %s ]" %  message)
+                    # release after short wait
+                    time.sleep(3)
                     ep_gripper.open(power=50)
                     time.sleep(1)
                     ep_gripper.pause()
@@ -343,11 +366,3 @@ if __name__ == '__main__':
             ep_robot.close()
             print ('Exiting')
             exit(1)
-
-    
-
-
-
-
-
-    

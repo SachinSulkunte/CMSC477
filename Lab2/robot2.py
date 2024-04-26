@@ -10,6 +10,12 @@ import math
 from numpy.linalg import inv
 from ultralytics import YOLO 
 import math
+import zmq
+
+addr = "" # depending on whose laptop is used
+context = zmq.Context()
+socket = context.socket(zmq.REP)
+socket.bind(addr)
 
 distanceSignal = []
 
@@ -75,11 +81,6 @@ def distance_from_box_size(boxWidth, boxHeight):
         h_distance = 0.1
     else:
         h_distance = a * np.power(boxHeight,3) + b * np.power(boxHeight,2) + c * boxHeight + d
-    # distanceSignal.append(h_distance)
-
-    #rolling median filter
-    # if(len(distanceSignal) > 3):
-    #     h_distance =  np.median(distanceSignal[-3:])
 
     return h_distance
 def grab_frame(camera):
@@ -97,19 +98,19 @@ def thres_image(img):
 
 
     # For tracking orange
-    # orangeLower = np.array([0, 103, 220]) 
-    # orangeUpper = np.array([179, 255, 255]) 
-    # orange_mask = cv2.inRange(hsv, orangeLower, orangeUpper)
-    # cv2.imshow("hsv orange mask", orange_mask)
-    # thresholded = cv2.bitwise_and(img,img, mask=orange_mask)
+    orangeLower = np.array([0, 103, 220]) 
+    orangeUpper = np.array([179, 255, 255]) 
+    orange_mask = cv2.inRange(hsv, orangeLower, orangeUpper)
+    cv2.imshow("hsv orange mask", orange_mask)
+    thresholded = cv2.bitwise_and(img,img, mask=orange_mask)
 
     # For tracking blue
-    blueLower = np.array([96,147,59])
-    blueUpper = np.array([179,255,255])
-    blue_mask = cv2.inRange(hsv, blueLower, blueUpper)
+    # blueLower = np.array([96,147,59])
+    # blueUpper = np.array([179,255,255])
+    # blue_mask = cv2.inRange(hsv, blueLower, blueUpper)
     #cv2.imshow("hsv",hsv)
     #cv2.imshow("hsv blue mask", blue_mask)
-    thresholded = cv2.bitwise_and(img,img, mask=blue_mask)
+    thresholded = cv2.bitwise_and(img,img, mask=orange_mask)
 
     return thresholded
 
@@ -190,22 +191,16 @@ def getAngle():
 
         print(angle)
 
-
-
-
         print("---")
         cv2.waitKey(0)
 
         return angle
 
 
-
-
 if __name__ == '__main__':
     print("start")
     model = YOLO('/Users/sachin/Documents/Coursework/CMSC477/CMSC477/Lab2/best_v2.pt')
-    # Use vid instead of ep_camera to use your laptop's webcam
-    # vid = cv2.VideoCapture(0)
+
     ep_robot = robot.Robot()
     ep_robot.initialize(conn_type="ap")
     ep_camera = ep_robot.camera
@@ -215,6 +210,7 @@ if __name__ == '__main__':
     ep_gripper = ep_robot.gripper
     ep_arm = ep_robot.robotic_arm
 
+    startMsgReceived = False
     while True:
         try:
             # ret, frame = vid.read()
@@ -230,6 +226,12 @@ if __name__ == '__main__':
             names = results[0].names
             confidences = results[0].boxes.conf.tolist()
 
+            message = socket.recv()
+            print("Received request: %s" % message)
+            startMsgReceived = True
+
+            #  drive to other robot
+            
             # Iterate through the results
             for box, cls, conf in zip(boxes, classes, confidences):
                 x, y, w, h = box
@@ -239,7 +241,7 @@ if __name__ == '__main__':
                 name = names[int(cls)]
 
                 # search either for lego or robot
-                if name == 'lego':
+                if name == 'lego' and startMsgReceived:
                     print("x: {}, y: {}".format(x, y))
                     print("Width of Box: {}, Height of Box: {}".format(w, h))
                     print("Distance: " + str(distance_from_box_size(w, h)))
@@ -248,7 +250,7 @@ if __name__ == '__main__':
                     duration = 0.5
                     goal_x = 10.0 # 10cm away from the lego object
                     goal_y = 10.0 # 10cm away from the lego object
-                    
+            
                     dist = float(distance_from_box_size(w, h)) - 0.32
 
                     # open gripper, drive to lego
@@ -264,13 +266,26 @@ if __name__ == '__main__':
                     time.sleep(1)
                     ep_gripper.pause()
                     
-                    time.sleep(10) # wait for robot1 to release
+                    #  send reply back to client
+                    socket.send(b"Release")
+                    time.sleep(2) # wait for robot1 to release
                     
                     # lift arm
-                    ep_arm.move(x=0, y=10).wait_for_completed()
-                    # drive to target zone NEED TO DO
-                    ep_chassis.move(x=0.2, y=0.1, z=0, xy_speed=0.5).wait_for_completed()
+                    ep_arm.move(x=0, y=20).wait_for_completed()
+                    # drive to target zone
+                    angle, is_close = getAngle(frame)
+                    if angle is not None:
+                        angle = float(angle)
+                    # rotate
+                    ep_chassis.move(x=0, y=0, z=90 - angle, z_speed=30).wait_for_completed()
 
+                    # keep driving forward until camera loses sight of target
+                    if not is_close:
+                        ep_chassis.move(x=0.2, y=0, z=0, xy_speed=0.3).wait_for_completed()
+                    else:
+                        # stop movement
+                        ep_chassis.move(x=0, y=0, z=0, xy_speed=0.3).wait_for_completed()
+                    
                     # release lego
                     ep_gripper.open(power=50)
                     time.sleep(1)
