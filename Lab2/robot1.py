@@ -48,7 +48,7 @@ def edge_img(img):
     return cv2.Canny(img, 30, 50)
 
 def line_image(img):
-    return cv2.HoughLines(img, 1, np.pi/180, 20)
+    return cv2.HoughLines(img, 1, np.pi/180, 30)
 
 def plot_Hough_Lines(img, rho, theta):
     a = np.cos(theta)
@@ -94,10 +94,10 @@ def getAngle(image):
     lines = line_image(edged)
     print(lines)
 
-    if lines.all() != None:
     
-        rho = []
-        theta = []
+    rho = []
+    theta = []
+    if lines is not None:
         for i in range(0, len(lines)):
             for r, o in lines[i]:
                 rho.append(r)
@@ -112,16 +112,11 @@ def getAngle(image):
         final = plot_Hough_Lines(image,rho_avg,theta_avg)
         cv2.imshow("Final",final)
 
-        print(angle)
-        print("---")
+    bottom_percentile = image.shape[0] * 0.9
+    bottom_of_line = max(final[:, 0, 1])
+    is_close = bottom_of_line >= bottom_percentile
 
-        bottom_percentile = image.shape[0] * 0.9
-        bottom_of_line = max(final[:, 0, 1])
-        is_close = bottom_of_line >= bottom_percentile
-
-        return angle, is_close
-    else:
-        return None, None
+    return angle, is_close
 
 def find_pose_from_object(K, x, y, w, h, box):
     w_half_size = w / 2
@@ -241,6 +236,9 @@ if __name__ == '__main__':
     ep_arm = ep_robot.robotic_arm
     stage1 = False
     first = True
+    first_angle = True
+    ctr = 5
+
     while True:
         try:
             # ret, frame = vid.read()
@@ -286,7 +284,7 @@ if __name__ == '__main__':
                             goal_x = 10.0 # 10cm away from the lego object
                             goal_y = 10.0 # 10cm away from the lego object
                             
-                            dist = float(distance_from_box_size(w, h)) - 0.32
+                            dist = float(distance_from_box_size(w, h)) -0.17 #- 0.32
 
                             # vel_x = (distance_from_box_size(w, h) - goal_x)  / duration
                             # vel_y = (distance_from_box_size(w, h) - goal_y) / duration
@@ -316,16 +314,19 @@ if __name__ == '__main__':
                 # drive to blue line
                 print("driving to blue line")
                 angle, is_close = getAngle(frame)
+                angle = float(angle)
                 print(angle)
-                # angle, is_close = detect_blue_line(frame)
-                ep_chassis.move(x=0, y=0, z=(90 - angle), z_speed=40).wait_for_completed() # rotate to blue line
-                
+                ctr-=1
+                if first_angle and ctr == 0:
+                    ep_chassis.move(x=0, y=0, z=90-angle, z_speed=10).wait_for_completed() # rotate to blue line
+                    first_angle = False
+
                 if not is_close: # drive forward if not close yet
                     ep_chassis.drive_speed(x=0.1, y=0, z=0, timeout=1)
                     time.sleep(0.4)
                 else:
                     if first == True:
-                        ep_chassis.move(x=0.2, y=0, z=0, timeout=1)
+                        ep_chassis.move(x=0.2, y=0, z=0).wait_for_completed()
                         first = False
                     print("close")
                     ep_chassis.drive_speed(x=0, y=0, z=0, timeout=1)

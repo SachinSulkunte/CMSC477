@@ -35,28 +35,28 @@ def detect_blue_line(frame):
 
     return None, None
 
-# Capture video from camera
-cap = cv2.VideoCapture(0)
+# # Capture video from camera
+# cap = cv2.VideoCapture(0)
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+# while True:
+#     ret, frame = cap.read()
+#     if not ret:
+#         break
 
-    # Detect blue line
-    angle, is_close = detect_blue_line(frame)
+#     # Detect blue line
+#     angle, is_close = detect_blue_line(frame)
 
-    if angle is not None:
-        # Draw line indicating orientation
-        cv2.line(frame, (int(frame.shape[1]/2), int(frame.shape[0]/2)), (int(frame.shape[1]/2) + 100, int(frame.shape[0]/2) + int(100*np.tan(angle * np.pi / 180))), (0, 255, 0), 2)
-        print("Angle: " + str(angle))
+#     if angle is not None:
+#         # Draw line indicating orientation
+#         cv2.line(frame, (int(frame.shape[1]/2), int(frame.shape[0]/2)), (int(frame.shape[1]/2) + 100, int(frame.shape[0]/2) + int(100*np.tan(angle * np.pi / 180))), (0, 255, 0), 2)
+#         print("Angle: " + str(angle))
         
-        if is_close:
-            cv2.putText(frame, "Blue line is close", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+#         if is_close:
+#             cv2.putText(frame, "Blue line is close", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-    cv2.imshow('Frame', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+#     cv2.imshow('Frame', frame)
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
 
-cap.release()
+# cap.release()
 cv2.destroyAllWindows()

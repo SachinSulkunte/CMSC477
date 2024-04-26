@@ -43,27 +43,51 @@ def find_pose_from_object(K, x, y, w, h, box):
 
     return p.reshape((3,)), r.reshape((3,))
 
+distanceSignal = []
+
+# def getDistanceFromBB():
+#     model = YOLO('C:\\Users\\Melin\\OneDrive\\Spring 24\\CMSC477\\Lab 0\\Lab2\\better.pt')
+#     # Use vid instead of ep_camera to use your laptop's webcam
+#     # vid = cv2.VideoCapture(0)
+#     ep_robot = robot.Robot()
+#     ep_robot.initialize(conn_type="ap")
+#     ep_camera = ep_robot.camera
+#     ep_camera.start_video_stream(display=False, resolution=camera.STREAM_360P)
+#     while True:
+#         # ret, frame = vid.read()
+#         frame = ep_camera.read_cv2_image(strategy="newest", timeout=0.5)
+#         if frame is not None:
+#             if model.predictor:
+#                 model.predictor.args.verbose = False
+#         results = model.predict(source=frame, show=True)
+
+#         boxes = results[0].boxes.xywh.cpu()
+#         for box in boxes:
+#             x, y, w, h = box
+#             print("Width of Box: {}, Height of Box: {}".format(w, h))
+#             print("Distance: " + str(distance_from_box_size(w, h)))
+
 def distance_from_box_size(boxWidth, boxHeight):
 
     #param
-    gain = 1
-    offset = 1
-    expected_aspect_ratio = 7 #h/w
+    a = -6.79187460413004e-07
+    b = 2.963889750447219e-04
+    c = -0.0469580266109994
+    d = 3.02446421107312
+    vertexHeight = 185 #closest distance quad fit is modelled for
 
-    actual_aspect_ratio = boxHeight / boxWidth
-    correction = expected_aspect_ratio/actual_aspect_ratio
-    actualHeight = boxHeight * correction
-    
-    h_distance = gain * actualHeight + offset
-
-    distanceSignal.append(h_distance)
+    print("actualHeight: " + str(boxHeight))
+    if boxHeight > vertexHeight:
+        h_distance = 0.1
+    else:
+        h_distance = a * np.power(boxHeight,3) + b * np.power(boxHeight,2) + c * boxHeight + d
+    # distanceSignal.append(h_distance)
 
     #rolling median filter
-    if(len(distanceSignal) >= 3):
-        h_distance =  np.median(distanceSignal[-3:])
+    # if(len(distanceSignal) > 3):
+    #     h_distance =  np.median(distanceSignal[-3:])
 
     return h_distance
-
 
 if __name__ == '__main__':
     print("start")
@@ -73,8 +97,9 @@ if __name__ == '__main__':
     ep_robot = robot.Robot()
     ep_robot.initialize(conn_type="ap")
     ep_camera = ep_robot.camera
-    ep_camera.start_video_stream(display=True, resolution=camera.STREAM_360P)
+    ep_camera.start_video_stream(display=False, resolution=camera.STREAM_360P)
     ep_chassis = ep_robot.chassis
+    print("connected")
     ep_gripper = ep_robot.gripper
     ep_arm = ep_robot.robotic_arm
 
@@ -100,40 +125,56 @@ if __name__ == '__main__':
                 confidence = conf
                 detected_class = cls
                 name = names[int(cls)]
-                
-                print("x: {}, y: {}".format(x, y))
-                print("Width of Box: {}, Height of Box: {}".format(w, h))
-                print("Distance: " + str(distance_from_box_size(w, h)))
-                print("Detected object: ", name)
 
                 if name == 'lego':
-                    pose = find_pose_from_object(K, x, y, w, h, box)
-                    rot, jaco = cv2.Rodrigues(pose[1], pose[1])
+                    print("x: {}, y: {}".format(x, y))
+                    print("Width of Box: {}, Height of Box: {}".format(w, h))
+                    print("Distance: " + str(distance_from_box_size(w, h)))
+                    print("Detected object: ", name)
+                    
+                    # pose = find_pose_from_object(K, x, y, w, h, box)
+                    # rot, jaco = cv2.Rodrigues(pose[1], pose[1])
 
-                    pts = box.corners.reshape((-1, 1, 2)).astype(np.int32)
-                    img = cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=5)
-                    cv2.circle(img, tuple(box.center.astype(np.int32)), 5, (0, 0, 255), -1)
+                    # pts = box.corners.reshape((-1, 1, 2)).astype(np.int32)
+                    # img = cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=5)
+                    # cv2.circle(img, tuple(box.center.astype(np.int32)), 5, (0, 0, 255), -1)
                 
-                    rot = round(pose[1][2], 2) 
+                    # rot = round(pose[1][2], 2) 
                     
                     duration = 0.5
                     goal_x = 10.0 # 10cm away from the lego object
                     goal_y = 10.0 # 10cm away from the lego object
                     
-                    vel_x = (distance_from_box_size(w, h) - goal_x) * math.cos(rot) / duration
-                    vel_y = (distance_from_box_size(w, h) - goal_y) * math.cos(rot) / duration
-                    ep_chassis.drive_speed(x=vel_x, y=vel_y, z=rot, timeout=duration)
+                    dist = float(distance_from_box_size(w, h)) - 0.32
 
+                    # vel_x = (distance_from_box_size(w, h) - goal_x)  / duration
+                    # vel_y = (distance_from_box_size(w, h) - goal_y) / duration
+                    # print("vel")
+                    # print(vel_x, vel_y)
+                    # ep_chassis.drive_speed(x=vel_x, y=vel_y, z=0, timeout=duration)
+                    
+                    # open gripper, drive to lego
                     ep_gripper.open(power=50)
+                    time.sleep(1)
+                    ep_chassis.move(x=dist, y=0, z=0, xy_speed=0.7).wait_for_completed()
                     time.sleep(1)
                     ep_gripper.pause()
 
+                    # adjust arm position, close gripper on lego
                     ep_arm.move(x=goal_x - 1.0, y=goal_y - 1.0).wait_for_completed()
-
                     ep_gripper.close(power=50)
                     time.sleep(1)
                     ep_gripper.pause()
 
+                    # lift arm
+                    ep_arm.move(x=0, y=50).wait_for_completed()
+                    # drive to blue line
+                    ep_chassis.move(x=0.2, y=0.1, z=0, xy_speed=0.5).wait_for_completed()
+
+                    # release lego once other robot has arrived
+                    ep_gripper.open(power=50)
+                    time.sleep(1)
+                    ep_gripper.pause()
                     ep_robot.close()
 
         except KeyboardInterrupt:
