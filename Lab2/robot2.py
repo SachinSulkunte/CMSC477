@@ -147,7 +147,9 @@ def plot_Hough_Lines(img, rho, theta):
 
 def getAngle():
 
-    image = grab_frame("Insert the name of the camera feed from here?")
+    vid = cv2.VideoCapture(0)
+
+    image = grab_frame(vid)
     
     # image = cv2.imread("robot_blorange.jpg")
 
