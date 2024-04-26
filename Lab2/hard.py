@@ -31,7 +31,7 @@ if __name__ == '__main__':
             ep_gripper.open(power=50)
             time.sleep(1)
             ep_chassis.move(x=0, y=0.0, z=15, z_speed=15).wait_for_completed()
-            ep_chassis.move(x=0.3, y=0.0, z=0, xy_speed=0.7).wait_for_completed()
+            ep_chassis.move(x=0.5, y=0.0, z=0, xy_speed=0.7).wait_for_completed()
             time.sleep(1)
             ep_gripper.pause()
 
@@ -40,12 +40,13 @@ if __name__ == '__main__':
             ep_gripper.close(power=50)
             time.sleep(1)
             ep_gripper.pause()
+            time.sleep(10)
 
             # lift arm
-            ep_arm.move(x=0, y=50).wait_for_completed()
+            # ep_arm.move(x=0, y=50).wait_for_completed()
             # drive to blue line
-            ep_chassis.move(x=0.6, y=0.3, z=0, xy_speed=0.5).wait_for_completed()
-            ep_chassis.move(x=0, y=0, z=-15, z_speed=0.5).wait_for_completed()
+            ep_chassis.move(x=0, y=0, z=180, z_speed=0.5).wait_for_completed()
+            ep_chassis.move(x=1, y=0, z=0, xy_speed=0.5).wait_for_completed()
 
             # release lego once other robot has arrived
             ep_gripper.open(power=50)
@@ -58,11 +59,5 @@ if __name__ == '__main__':
             ep_robot.close()
             print ('Exiting')
             exit(1)
-
-    
-
-
-
-
 
     
