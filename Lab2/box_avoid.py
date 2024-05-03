@@ -29,7 +29,7 @@ def sub_data_handler(sub_info):
 #
 def avoid_obstacle(distance):
     if distance < 240:
-        ep_chassis.move(x=-0.1, y=0.0, z=0).wait_for_completed()
+        ep_chassis.move(x=-0.1, y=-0.1, z=0).wait_for_completed()
     return
 
 
